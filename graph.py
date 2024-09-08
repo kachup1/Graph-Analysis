@@ -77,16 +77,32 @@ def main():
     outputFile = input[6]
 
     if inputFile:
-        with open(inputFile, "r") as f:
-            for line in f:
-                pass
+        if not inputFile.endswith('.gml'):
+            print("Error. Input file must be type .gml")
+        else:
+            G = nx.read_gml(inputFile) #loads graph from gml file
     elif create_random_graph:
         if nodes <= 0:
             print("Error. Nodes must be greater than 0.")
-        G = nx.erdos_renyi_graph(nodes, probability)
-        if plot:
-            nx.draw(G, with_labels=True)
-            plt.show()
+            sys.exit(1)
+        G = nx.erdos_renyi_graph(nodes, probability)# generates erdos
+        G = nx.relabel_nodes(G, lambda x: str(x)) #relabels nodes to str
+        
+
+    if BFS:
+        if BFS not in G:
+            print("Error. Node {BFS} does not exist in the graph.")
+            sys.exit(1)
+        bfsPaths = nx.single_source_shortest_path_length(G, BFS)
+        for node, dist in bfsPaths.items():
+            print("Node {node} : Distance {dist}")
+
+    if plot:
+        nx.draw(G, with_labels=True)
+        plt.show()
+    
+    if outputFile:
+        nx.write_gml(G, outputFile)
 
 
     print(sys.argv[1:])
