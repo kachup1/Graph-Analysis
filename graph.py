@@ -38,7 +38,6 @@ def CommandLineArgs(argv):
             inputFile = argv[i+1]
             i += 2 #moves to next set of arguments
         elif argv[i] == '--create_random_graph':
-            print("OUTPUT")
             create_random_graph = True
             i += 1
         elif argv[i] == '--nodes':
@@ -46,7 +45,7 @@ def CommandLineArgs(argv):
             i += 2 
         elif argv[i] == '--constant':
             constant = float(argv[i+1])
-            probability = (constant * math.log(nodes)) / nodes
+            probability = float((constant * math.log(nodes)) / nodes)
             i += 2 
         elif argv[i] == '--plot':
             plot = True
@@ -67,23 +66,8 @@ def CommandLineArgs(argv):
 
 def main():
 
-    '''
-    #create a graph with no nodes and no edges
-    G = nx.Graph()
-
-    #add one note
-    G.add_node(2)
-
-    #adding edges
-    G.add_edge(1,2)
-
-    #print graphs info
-    nx.draw(G, with_labels=True)
-    plt.show()
-    '''
-
     input = CommandLineArgs(sys.argv)
-    print("HELLO")
+
     inputFile = input[0]
     create_random_graph = input[1]
     nodes = input[2]
