@@ -1,8 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-import numpy as np
 import math
-import sys #reads command line arguments
+import sys
 
 '''
 Function that reads the command lines from terminal
@@ -18,8 +17,7 @@ python ./graph.py --input graph_file.gml --create_random_graph
 --plot                      : requests that the graph be plotted
 --output out_graph_file.gml : where resulting graph should be saved.
 '''
-
-def CommandLineArgs(argv):
+def CommandLineArgs(argv): #parses through the command line arguments
     inputFile = ''
     create_random_graph = False
     nodes = 0
@@ -29,6 +27,7 @@ def CommandLineArgs(argv):
     BFS = ''
     outputFile = ''
 
+    #loops through command line arguments and handles errors if invalid inputs are provided
     i = 1
     while i < len(argv):
         if argv[i] == '--input':
@@ -70,11 +69,10 @@ def CommandLineArgs(argv):
     
     return [inputFile, create_random_graph, nodes, probability, plot, BFS, outputFile]
 
-
+#main function
 def main():
-
-    input = CommandLineArgs(sys.argv)
-
+    input = CommandLineArgs(sys.argv) #gets command line arguments
+    
     inputFile = input[0]
     create_random_graph = input[1]
     nodes = input[2]
@@ -83,32 +81,40 @@ def main():
     BFS = input[5]
     outputFile = input[6]
 
+    #loads the graph from a file or it creates a random graph
     if inputFile:
-        G = nx.read_gml(inputFile) #loads graph from gml file
+        G = nx.read_gml(inputFile)
     elif create_random_graph:
         if nodes <= 0:
             print("Error. Nodes must be greater than 0.")
             sys.exit(1)
-        G = nx.erdos_renyi_graph(nodes, probability)# generates erdos
-        G = nx.relabel_nodes(G, lambda x: str(x)) #relabels nodes to str
-        
+        G = nx.erdos_renyi_graph(nodes, probability)#built in function for erdos random graph
+        G = nx.relabel_nodes(G, lambda x: str(x))#converts to strings
+        if plot:
+            plt.figure() 
+            nx.draw( G, with_labels=True, node_size=700, font_size=12, node_color='pink', edge_color='purple', font_weight='bold')
+            plt.show()
+
+    #performs bfs 
     if BFS:
         if BFS not in G:
-            print("Error. Node {BFS} does not exist in the graph.")
+            print(f"Error. Node {BFS} does not exist in the graph.")
             sys.exit(1)
-        bfsPaths = nx.single_source_shortest_path_length(G, BFS)
-        for node, dist in bfsPaths.items():
-            print("Node {node} : Distance {dist}")
+        elif BFS and input:
+            bfs_tree = nx.bfs_tree(G, source=BFS) #computes BFS tree
+            
+            # NetworkX func - gets positions for the BFS tree
+            pos = nx.bfs_layout(bfs_tree, BFS)
+            
+            #draws the BFS tree 
+            plt.figure()  
+            nx.draw(bfs_tree, pos, with_labels=True, node_size=700, font_size=12, node_color='pink', edge_color='purple', font_weight='bold')
+            plt.title(f"BFS Tree from Node {BFS}")
+            plt.show()
 
-    if plot:
-        nx.draw(G, with_labels=True)
-        plt.show()
-    
+    #saves graph to file
     if outputFile:
         nx.write_gml(G, outputFile)
 
-
-    print(sys.argv[1:])
-   
 if __name__ == "__main__":
     main()
